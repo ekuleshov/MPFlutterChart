@@ -57,7 +57,7 @@ class EvenMoreDynamicState extends ActionState<EvenMoreDynamic>
           item('Add Data Set', 'D'),
           item('Remove Data Set', 'E'),
           item('Clear chart', 'F'),
-          item('Save to Gallery', 'G'),
+          // item('Save to Gallery', 'G'),
         ];
   }
 
@@ -96,11 +96,11 @@ class EvenMoreDynamicState extends ActionState<EvenMoreDynamic>
         controller.data = null;
         controller.state.setStateIfNotDispose();
         break;
-      case 'G':
-        captureImg(() {
-          controller.state.capture();
-        });
-        break;
+      // case 'G':
+      //   captureImg(() {
+      //     controller.state.capture();
+      //   });
+      //   break;
     }
   }
 

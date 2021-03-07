@@ -1,13 +1,13 @@
-import 'dart:io';
-import 'dart:typed_data';
+// import 'dart:io';
+// import 'dart:typed_data';
 
 import 'package:flutter/widgets.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:mp_chart/mp/controller/controller.dart';
 import 'package:optimized_gesture_detector/details.dart';
 import 'package:optimized_gesture_detector/optimized_gesture_detector.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:screenshot/screenshot.dart';
+// import 'package:image_gallery_saver/image_gallery_saver.dart';
+// import 'package:path_provider/path_provider.dart';
+// import 'package:screenshot/screenshot.dart';
 
 abstract class Chart<C extends Controller> extends StatefulWidget {
   final C controller;
@@ -21,7 +21,7 @@ abstract class Chart<C extends Controller> extends StatefulWidget {
 }
 
 abstract class ChartState<T extends Chart> extends State<T> {
-  final ScreenshotController _screenshotController = ScreenshotController();
+  // final ScreenshotController _screenshotController = ScreenshotController();
   bool isCapturing = false;
 
   void setStateIfNotDispose() {
@@ -32,30 +32,30 @@ abstract class ChartState<T extends Chart> extends State<T> {
 
   void updatePainter();
 
-  void capture() async {
-    if (isCapturing) return;
-    isCapturing = true;
-    String directory = "";
-    if (Platform.isAndroid) {
-      directory = (await getExternalStorageDirectory()).path;
-    } else if (Platform.isIOS) {
-      directory = (await getApplicationDocumentsDirectory()).path;
-    } else {
-      return;
-    }
-
-    String fileName = DateTime.now().toIso8601String();
-    String path = '$directory/$fileName.png';
-    _screenshotController.capture(path: path, pixelRatio: 3.0).then((imgFile) {
-      ImageGallerySaver.saveImage(Uint8List.fromList(imgFile.readAsBytesSync()))
-          .then((value) {
-        imgFile.delete();
-      });
-      isCapturing = false;
-    }).catchError((error) {
-      isCapturing = false;
-    });
-  }
+  // void capture() async {
+  //   if (isCapturing) return;
+  //   isCapturing = true;
+  //   String directory = "";
+  //   if (Platform.isAndroid) {
+  //     directory = (await getExternalStorageDirectory()).path;
+  //   } else if (Platform.isIOS) {
+  //     directory = (await getApplicationDocumentsDirectory()).path;
+  //   } else {
+  //     return;
+  //   }
+  //
+  //   String fileName = DateTime.now().toIso8601String();
+  //   String path = '$directory/$fileName.png';
+  //   _screenshotController.capture(path: path, pixelRatio: 3.0).then((imgFile) {
+  //     ImageGallerySaver.saveImage(Uint8List.fromList(imgFile.readAsBytesSync()))
+  //         .then((value) {
+  //       imgFile.delete();
+  //     });
+  //     isCapturing = false;
+  //   }).catchError((error) {
+  //     isCapturing = false;
+  //   });
+  // }
 
   @override
   void didUpdateWidget(T oldWidget) {
@@ -69,9 +69,10 @@ abstract class ChartState<T extends Chart> extends State<T> {
     widget.controller.doneBeforePainterInit();
     widget.controller.initialPainter();
     updatePainter();
-    return Screenshot(
-        controller: _screenshotController,
-        child: Container(
+    // return Screenshot(
+    //     controller: _screenshotController,
+    //     child: Container(
+    return Container(
             child: Stack(
                 // Center is a layout widget. It takes a single child and positions it
                 // in the middle of the parent.
@@ -121,7 +122,9 @@ abstract class ChartState<T extends Chart> extends State<T> {
                       needVerticalConflictFunc:
                           widget.controller.verticalConflictResolveFunc,
                       child: CustomPaint(painter: widget.controller.painter))),
-            ])));
+            ])
+    );
+    // );
   }
 
   @override
