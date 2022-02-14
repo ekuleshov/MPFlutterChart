@@ -14,7 +14,7 @@ abstract class Chart<C extends Controller> extends StatefulWidget {
 
   @override
   State createState() {
-    return controller.createChartState();
+    return controller.createChartState()!;
   }
 
   const Chart(this.controller);
@@ -131,7 +131,7 @@ abstract class ChartState<T extends Chart> extends State<T> {
   void reassemble() {
     super.reassemble();
     widget.controller.animator?.reset();
-    widget.controller.painter?.reassemble();
+    widget.controller.painter.reassemble();
   }
 
   void onTapDown(TapDownDetails details);

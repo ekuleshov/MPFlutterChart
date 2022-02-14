@@ -1,6 +1,6 @@
-import 'dart:ui';
 
 import 'package:flutter/painting.dart';
+
 import 'package:mp_chart/mp/core/adapter_android_mp.dart';
 import 'package:mp_chart/mp/core/animator.dart';
 import 'package:mp_chart/mp/core/data_interfaces/i_data_set.dart';
@@ -13,7 +13,7 @@ import 'package:mp_chart/mp/core/utils/utils.dart';
 
 abstract class DataRenderer extends Renderer {
   /// the animator object used to perform animations on the chart data
-  Animator _animator;
+  Animator? _animator;
 
   /// main paint object used for rendering
   Paint _renderPaint;
@@ -25,25 +25,20 @@ abstract class DataRenderer extends Renderer {
 
   TextPainter _valuePaint;
 
-  DataRenderer(Animator animator, ViewPortHandler viewPortHandler)
-      : super(viewPortHandler) {
-    this._animator = animator;
-
-    _renderPaint = Paint()
-      ..isAntiAlias = true
-      ..style = PaintingStyle.fill;
-
-    _drawPaint = Paint();
-
-    _valuePaint = PainterUtils.create(_valuePaint, null,
-        Color.fromARGB(255, 63, 63, 63), Utils.convertDpToPixel(9));
-
-    _highlightPaint = Paint()
-      ..isAntiAlias = true
-      ..strokeWidth = 2
-      ..style = PaintingStyle.stroke
-      ..color = Color.fromARGB(255, 255, 187, 115);
-  }
+  DataRenderer(Animator? animator, ViewPortHandler viewPortHandler)
+      : this._animator = animator,
+        this._renderPaint = Paint()
+          ..isAntiAlias = true
+          ..style = PaintingStyle.fill,
+        this._drawPaint = Paint(),
+        this._valuePaint = PainterUtils.create(null, null,
+            Color.fromARGB(255, 63, 63, 63), Utils.convertDpToPixel(9)),
+        this._highlightPaint = Paint()
+          ..isAntiAlias = true
+          ..strokeWidth = 2
+          ..style = PaintingStyle.stroke
+          ..color = Color.fromARGB(255, 255, 187, 115),
+        super(viewPortHandler);
 
   bool isDrawingValuesAllowed(ChartInterface chart) {
     return chart.getData().getEntryCount() <
@@ -63,7 +58,7 @@ abstract class DataRenderer extends Renderer {
 
   Paint get renderPaint => _renderPaint;
 
-  Animator get animator => _animator;
+  Animator? get animator => _animator;
 
   Paint get drawPaint => _drawPaint;
 
@@ -79,8 +74,8 @@ abstract class DataRenderer extends Renderer {
   void applyValueTextStyle(IDataSet set) {
     _valuePaint = PainterUtils.create(_valuePaint, null,
         Color.fromARGB(255, 63, 63, 63), Utils.convertDpToPixel(9),
-        fontFamily: set?.getValueTypeface()?.fontFamily,
-        fontWeight: set?.getValueTypeface()?.fontWeight);
+        fontFamily: set.getValueTypeface()?.fontFamily,
+        fontWeight: set.getValueTypeface()?.fontWeight);
   }
 
   /// Initializes the buffers used for rendering with a  size. Since this
@@ -116,5 +111,5 @@ abstract class DataRenderer extends Renderer {
   ///
   /// @param c
   /// @param indices the highlighted values
-  void drawHighlighted(Canvas c, List<Highlight> indices);
+  void drawHighlighted(Canvas c, List<Highlight>? indices);
 }

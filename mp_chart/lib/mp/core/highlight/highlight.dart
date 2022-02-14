@@ -25,31 +25,30 @@ class Highlight {
   int _stackIndex = -1;
 
   /// the axis the highlighted value belongs to
-  AxisDependency _axis;
+  AxisDependency? _axis;
 
   /// the x-position (pixels) on which this highlight object was last drawn
-  double _drawX;
+  double? _drawX;
 
   /// the y-position (pixels) on which this highlight object was last drawn
-  double _drawY;
+  double? _drawY;
 
-  Highlight(
-      {double x = double.nan,
+  Highlight({
+      double x = double.nan,
       double y = double.nan,
       double xPx = 0,
       double yPx = 0,
       int dataSetIndex = 0,
       int stackIndex = -1,
       // ignore: avoid_init_to_null
-      AxisDependency axis = null}) {
-    this._x = x;
-    this._y = y;
-    this._xPx = xPx;
-    this._yPx = yPx;
-    this._dataSetIndex = dataSetIndex;
-    this._axis = axis;
-    this._stackIndex = stackIndex;
-  }
+      AxisDependency? axis = null})
+      : this._x = x,
+        this._y = y,
+        this._xPx = xPx,
+        this._yPx = yPx,
+        this._dataSetIndex = dataSetIndex,
+        this._stackIndex = stackIndex,
+        this._axis = axis;
 
   double get x => _x;
 
@@ -75,27 +74,27 @@ class Highlight {
     return _stackIndex >= 0;
   }
 
-  AxisDependency get axis => _axis;
+  AxisDependency? get axis => _axis;
 
   /// Sets the x- and y-position (pixels) where this highlight was last drawn.
   ///
   /// @param x
   /// @param y
-  void setDraw(double x, double y) {
+  void setDraw(double? x, double? y) {
     this._drawX = x;
     this._drawY = y;
   }
 
-  double get drawX => _drawX;
+  double? get drawX => _drawX;
 
-  double get drawY => _drawY;
+  double? get drawY => _drawY;
 
   /// Returns true if this highlight object is equal to the other (compares
   /// xIndex and dataSetIndex)
   ///
   /// @param h
   /// @return
-  bool equalTo(Highlight h) {
+  bool equalTo(Highlight? h) {
     if (h == null)
       return false;
     else {

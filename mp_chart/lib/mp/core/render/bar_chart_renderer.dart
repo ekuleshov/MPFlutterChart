@@ -1,7 +1,7 @@
 import 'dart:math';
-import 'dart:ui';
 
 import 'package:flutter/painting.dart';
+
 import 'package:mp_chart/mp/core/adapter_android_mp.dart';
 import 'package:mp_chart/mp/core/animator.dart';
 import 'package:mp_chart/mp/core/buffer/bar_buffer.dart';
@@ -22,32 +22,31 @@ import 'package:mp_chart/mp/core/value_formatter/value_formatter.dart';
 import 'package:mp_chart/mp/core/view_port.dart';
 
 class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
-  BarDataProvider _provider;
+  BarDataProvider? _provider;
 
   /// the rect object that is used for drawing the bars
   Rect _barRect = Rect.zero;
 
-  List<BarBuffer> _barBuffers;
+  List<BarBuffer?>? _barBuffers;
 
-  Paint _shadowPaint;
-  Paint _barBorderPaint;
+  Paint? _shadowPaint;
+  Paint? _barBorderPaint;
 
   BarChartRenderer(
-      BarDataProvider chart, Animator animator, ViewPortHandler viewPortHandler)
-      : super(animator, viewPortHandler) {
-    this._provider = chart;
-
+      BarDataProvider chart, Animator? animator, ViewPortHandler viewPortHandler)
+      : this._provider = chart,
+        this._shadowPaint = Paint()
+          ..isAntiAlias = true
+          ..style = PaintingStyle.fill,
+        this._barBorderPaint = Paint()
+          ..isAntiAlias = true
+          ..style = PaintingStyle.stroke,
+        super(animator, viewPortHandler)
+  {
     highlightPaint = Paint()
       ..isAntiAlias = true
       ..color = Color.fromARGB(120, 0, 0, 0)
       ..style = PaintingStyle.fill;
-
-    _shadowPaint = Paint()
-      ..isAntiAlias = true
-      ..style = PaintingStyle.fill;
-    _barBorderPaint = Paint()
-      ..isAntiAlias = true
-      ..style = PaintingStyle.stroke;
   }
 
   set barRect(Rect value) {
@@ -55,39 +54,39 @@ class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
   }
 
   // ignore: unnecessary_getters_setters
-  Paint get shadowPaint => _shadowPaint;
+  Paint? get shadowPaint => _shadowPaint;
 
   // ignore: unnecessary_getters_setters
-  set shadowPaint(Paint value) {
+  set shadowPaint(Paint? value) {
     _shadowPaint = value;
   }
 
   // ignore: unnecessary_getters_setters
-  Paint get barBorderPaint => _barBorderPaint;
+  Paint? get barBorderPaint => _barBorderPaint;
 
   // ignore: unnecessary_getters_setters
-  set barBorderPaint(Paint value) {
+  set barBorderPaint(Paint? value) {
     _barBorderPaint = value;
   }
 
   // ignore: unnecessary_getters_setters
-  List<BarBuffer> get barBuffers => _barBuffers;
+  List<BarBuffer?>? get barBuffers => _barBuffers;
 
   // ignore: unnecessary_getters_setters
-  set barBuffers(List<BarBuffer> value) {
+  set barBuffers(List<BarBuffer?>? value) {
     _barBuffers = value;
   }
 
-  BarDataProvider get provider => _provider;
+  BarDataProvider? get provider => _provider;
 
   @override
   void initBuffers() {
-    BarData barData = _provider.getBarData();
-    _barBuffers = List(barData.getDataSetCount());
+    BarData barData = _provider!.getBarData()!;
+    _barBuffers = List.filled(barData.getDataSetCount(), null);
 
-    for (int i = 0; i < _barBuffers.length; i++) {
-      IBarDataSet set = barData.getDataSetByIndex(i);
-      _barBuffers[i] = BarBuffer(
+    for (int i = 0; i < _barBuffers!.length; i++) {
+      IBarDataSet set = barData.getDataSetByIndex(i)!;
+      _barBuffers![i] = BarBuffer(
           set.getEntryCount() * 4 * (set.isStacked() ? set.getStackSize() : 1),
           barData.getDataSetCount(),
           set.isStacked());
@@ -96,10 +95,10 @@ class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
 
   @override
   void drawData(Canvas c) {
-    BarData barData = _provider.getBarData();
+    BarData barData = _provider!.getBarData()!;
 
     for (int i = 0; i < barData.getDataSetCount(); i++) {
-      IBarDataSet set = barData.getDataSetByIndex(i);
+      IBarDataSet set = barData.getDataSetByIndex(i)!;
 
       if (set.isVisible()) {
         drawDataSet(c, set, i);
@@ -108,40 +107,39 @@ class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
   }
 
   void drawDataSet(Canvas c, IBarDataSet dataSet, int index) {
-    Transformer trans = _provider.getTransformer(dataSet.getAxisDependency());
+    Transformer? trans = _provider!.getTransformer(dataSet.getAxisDependency());
 
-    _barBorderPaint..color = dataSet.getBarBorderColor();
-    _barBorderPaint
-      ..strokeWidth = Utils.convertDpToPixel(dataSet.getBarBorderWidth());
+    _barBorderPaint?..color = dataSet.getBarBorderColor();
+    _barBorderPaint?..strokeWidth = Utils.convertDpToPixel(dataSet.getBarBorderWidth())!;
 
     final bool drawBorder = dataSet.getBarBorderWidth() > 0.0;
 
-    double phaseX = animator.getPhaseX();
-    double phaseY = animator.getPhaseY();
+    double phaseX = animator!.getPhaseX();
+    double phaseY = animator!.getPhaseY();
 
     // draw the bar shadow before the values
-    if (_provider.isDrawBarShadowEnabled()) {
-      _shadowPaint..color = dataSet.getBarShadowColor();
+    if (_provider!.isDrawBarShadowEnabled()) {
+      _shadowPaint?..color = dataSet.getBarShadowColor();
 
-      BarData barData = _provider.getBarData();
+      BarData barData = _provider!.getBarData()!;
 
       final double barWidth = barData.barWidth;
       final double barWidthHalf = barWidth / 2.0;
-      double x;
+      double? x;
 
       for (int i = 0,
               count = min((((dataSet.getEntryCount()) * phaseX).ceil()),
                   dataSet.getEntryCount());
           i < count;
           i++) {
-        BarEntry e = dataSet.getEntryForIndex(i);
+        BarEntry e = dataSet.getEntryForIndex(i)!;
 
         x = e.x;
 
         _barShadowRectBuffer =
-            Rect.fromLTRB(x - barWidthHalf, 0.0, x + barWidthHalf, 0.0);
+            Rect.fromLTRB(x- barWidthHalf, 0.0, x + barWidthHalf, 0.0);
 
-        trans.rectValueToPixel(_barShadowRectBuffer);
+        trans!.rectValueToPixel(_barShadowRectBuffer);
 
         if (!viewPortHandler.isInBoundsLeft(_barShadowRectBuffer.right))
           continue;
@@ -154,31 +152,31 @@ class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
             _barShadowRectBuffer.right,
             viewPortHandler.contentBottom());
 
-        c.drawRect(_barShadowRectBuffer, _shadowPaint);
+        c.drawRect(_barShadowRectBuffer, _shadowPaint!);
       }
     }
 
     // initialize the buffer
-    BarBuffer buffer = _barBuffers[index];
+    BarBuffer buffer = _barBuffers![index]!;
     buffer.setPhases(phaseX, phaseY);
     buffer.dataSetIndex = (index);
-    buffer.inverted = (_provider.isInverted(dataSet.getAxisDependency()));
-    buffer.barWidth = (_provider.getBarData().barWidth);
+    buffer.inverted = (_provider!.isInverted(dataSet.getAxisDependency()));
+    buffer.barWidth = (_provider!.getBarData()!.barWidth);
 
     buffer.feed(dataSet);
 
-    trans.pointValuesToPixel(buffer.buffer);
+    trans!.pointValuesToPixel(buffer.buffer!);
 
-    final bool isSingleColor = dataSet.getColors().length == 1;
+    final bool isSingleColor = dataSet.getColors()!.length == 1;
 
     if (isSingleColor) {
       renderPaint..color = dataSet.getColor1();
     }
 
     for (int j = 0; j < buffer.size(); j += 4) {
-      if (!viewPortHandler.isInBoundsLeft(buffer.buffer[j + 2])) continue;
+      if (!viewPortHandler.isInBoundsLeft(buffer.buffer![j + 2])) continue;
 
-      if (!viewPortHandler.isInBoundsRight(buffer.buffer[j])) break;
+      if (!viewPortHandler.isInBoundsRight(buffer.buffer![j])) break;
 
       if (!isSingleColor) {
         // Set the color for the currently drawn value. If the index
@@ -187,45 +185,43 @@ class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
       }
 
       if (dataSet.getGradientColor1() != null) {
-        GradientColor gradientColor = dataSet.getGradientColor1();
+        GradientColor gradientColor = dataSet.getGradientColor1()!;
 
-        renderPaint
-          ..shader = (LinearGradient(
-                  colors: List()
+        renderPaint..shader = (LinearGradient(
+                  colors: []
                     ..add(gradientColor.startColor)
                     ..add(gradientColor.endColor),
                   tileMode: TileMode.mirror))
               .createShader(Rect.fromLTRB(
-                  buffer.buffer[j],
-                  buffer.buffer[j + 3],
-                  buffer.buffer[j],
-                  buffer.buffer[j + 1]));
+                  buffer.buffer![j]!,
+                  buffer.buffer![j + 3]!,
+                  buffer.buffer![j]!,
+                  buffer.buffer![j + 1]!));
       }
 
       if (dataSet.getGradientColors() != null) {
-        renderPaint
-          ..shader = (LinearGradient(
-                  colors: List()
+        renderPaint..shader = (LinearGradient(
+                  colors: []
                     ..add(dataSet.getGradientColor2(j ~/ 4).startColor)
                     ..add(dataSet.getGradientColor2(j ~/ 4).endColor),
                   tileMode: TileMode.mirror))
               .createShader(Rect.fromLTRB(
-                  buffer.buffer[j],
-                  buffer.buffer[j + 3],
-                  buffer.buffer[j],
-                  buffer.buffer[j + 1]));
+                  buffer.buffer![j]!,
+                  buffer.buffer![j + 3]!,
+                  buffer.buffer![j]!,
+                  buffer.buffer![j + 1]!));
       }
 
       c.drawRect(
-          Rect.fromLTRB(buffer.buffer[j], buffer.buffer[j + 1],
-              buffer.buffer[j + 2], buffer.buffer[j + 3]),
+          Rect.fromLTRB(buffer.buffer![j]!, buffer.buffer![j + 1]!,
+              buffer.buffer![j + 2]!, buffer.buffer![j + 3]!),
           renderPaint);
 
       if (drawBorder) {
         c.drawRect(
-            Rect.fromLTRB(buffer.buffer[j], buffer.buffer[j + 1],
-                buffer.buffer[j + 2], buffer.buffer[j + 3]),
-            _barBorderPaint);
+            Rect.fromLTRB(buffer.buffer![j]!, buffer.buffer![j + 1]!,
+                buffer.buffer![j + 2]!, buffer.buffer![j + 3]!),
+            _barBorderPaint!);
       }
     }
   }
@@ -240,21 +236,21 @@ class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
     double bottom = y2;
 
     _barRect = trans.rectToPixelPhase(
-        Rect.fromLTRB(left, top, right, bottom), animator.getPhaseY());
+        Rect.fromLTRB(left, top, right, bottom), animator!.getPhaseY());
   }
 
   @override
   void drawValues(Canvas c) {
     // if values are drawn
-    if (isDrawingValuesAllowed(_provider)) {
-      List<IBarDataSet> dataSets = _provider.getBarData().dataSets;
+    if (isDrawingValuesAllowed(_provider!)) {
+      List<IBarDataSet>? dataSets = _provider!.getBarData()!.dataSets;
 
-      final double valueOffsetPlus = Utils.convertDpToPixel(4.5);
+      final double? valueOffsetPlus = Utils.convertDpToPixel(4.5);
       double posOffset = 0.0;
       double negOffset = 0.0;
-      bool drawValueAboveBar = _provider.isDrawValueAboveBarEnabled();
+      bool drawValueAboveBar = _provider!.isDrawValueAboveBarEnabled();
 
-      for (int i = 0; i < _provider.getBarData().getDataSetCount(); i++) {
+      for (int i = 0; i < _provider!.getBarData()!.getDataSetCount(); i++) {
         IBarDataSet dataSet = dataSets[i];
 
         if (!shouldDrawValues(dataSet)) continue;
@@ -262,15 +258,15 @@ class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
         // apply the text-styling defined by the DataSet
         applyValueTextStyle(dataSet);
 
-        bool isInverted = _provider.isInverted(dataSet.getAxisDependency());
+        bool isInverted = _provider!.isInverted(dataSet.getAxisDependency());
 
         // calculate the correct offset depending on the draw position of
         // the value
         double valueTextHeight =
             Utils.calcTextHeight(valuePaint, "8").toDouble();
         posOffset = (drawValueAboveBar
-            ? -valueOffsetPlus
-            : valueTextHeight + valueOffsetPlus);
+            ? -valueOffsetPlus!
+            : valueTextHeight + valueOffsetPlus!);
         negOffset = (drawValueAboveBar
             ? valueTextHeight + valueOffsetPlus
             : -valueOffsetPlus);
@@ -281,39 +277,39 @@ class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
         }
 
         // get the buffer
-        BarBuffer buffer = _barBuffers[i];
+        BarBuffer? buffer = _barBuffers![i];
 
-        final double phaseY = animator.getPhaseY();
+        final double phaseY = animator!.getPhaseY();
 
-        ValueFormatter formatter = dataSet.getValueFormatter();
+        ValueFormatter? formatter = dataSet.getValueFormatter();
 
         MPPointF iconsOffset = MPPointF.getInstance3(dataSet.getIconsOffset());
-        iconsOffset.x = Utils.convertDpToPixel(iconsOffset.x);
-        iconsOffset.y = Utils.convertDpToPixel(iconsOffset.y);
+        iconsOffset.x = Utils.convertDpToPixel(iconsOffset.x)!;
+        iconsOffset.y = Utils.convertDpToPixel(iconsOffset.y)!;
 
         // if only single values are drawn (sum)
         if (!dataSet.isStacked()) {
           for (int j = 0;
-              j < buffer.buffer.length * animator.getPhaseX();
+              j < buffer!.buffer!.length * animator!.getPhaseX();
               j += 4) {
-            double x = (buffer.buffer[j] + buffer.buffer[j + 2]) / 2.0;
+            double x = (buffer.buffer![j]! + buffer.buffer![j + 2]!) / 2.0;
 
             if (!viewPortHandler.isInBoundsRight(x)) break;
 
-            if (!viewPortHandler.isInBoundsY(buffer.buffer[j + 1]) ||
+            if (!viewPortHandler.isInBoundsY(buffer.buffer![j + 1]) ||
                 !viewPortHandler.isInBoundsLeft(x)) continue;
 
-            BarEntry entry = dataSet.getEntryForIndex(j ~/ 4);
-            double val = entry.y;
+            BarEntry entry = dataSet.getEntryForIndex(j ~/ 4)!;
+            double? val = entry.y;
 
             if (dataSet.isDrawValuesEnabled()) {
               drawValue(
                   c,
-                  formatter.getBarLabel(entry),
+                  formatter!.getBarLabel(entry),
                   x,
-                  val >= 0
-                      ? (buffer.buffer[j + 1] + posOffset)
-                      : (buffer.buffer[j + 3] + negOffset),
+                  val>= 0
+                      ? (buffer.buffer![j + 1]! + posOffset)
+                      : (buffer.buffer![j + 3]! + negOffset),
                   dataSet.getValueTextColor2(j ~/ 4),
                   dataSet.getValueTextSize(),
                   dataSet.getValueTypeface());
@@ -321,33 +317,33 @@ class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
 
             if (entry.mIcon != null && dataSet.isDrawIconsEnabled()) {
               double px = x;
-              double py = val >= 0
-                  ? (buffer.buffer[j + 1] + posOffset)
-                  : (buffer.buffer[j + 3] + negOffset);
+              double py = val>= 0
+                  ? (buffer.buffer![j + 1]! + posOffset)
+                  : (buffer.buffer![j + 3]! + negOffset);
 
               px += iconsOffset.x;
               py += iconsOffset.y;
 
               if (entry.mIcon != null && dataSet.isDrawIconsEnabled()) {
                 CanvasUtils.drawImage(
-                    c, Offset(px, py), entry.mIcon, Size(15, 15), drawPaint);
+                    c, Offset(px, py), entry.mIcon!, Size(15, 15), drawPaint);
               }
             }
           }
 
           // if we have stacks
         } else {
-          Transformer trans =
-              _provider.getTransformer(dataSet.getAxisDependency());
+          Transformer? trans =
+              _provider!.getTransformer(dataSet.getAxisDependency());
 
           int bufferIndex = 0;
           int index = 0;
-          while (index < dataSet.getEntryCount() * animator.getPhaseX()) {
-            BarEntry entry = dataSet.getEntryForIndex(index);
+          while (index < dataSet.getEntryCount() * animator!.getPhaseX()) {
+            BarEntry entry = dataSet.getEntryForIndex(index)!;
 
-            List<double> vals = entry.yVals;
+            List<double>? vals = entry.yVals;
             double x =
-                (buffer.buffer[bufferIndex] + buffer.buffer[bufferIndex + 2]) /
+                (buffer!.buffer![bufferIndex]! + buffer.buffer![bufferIndex + 2]!) /
                     2.0;
 
             Color color = dataSet.getValueTextColor2(index);
@@ -358,17 +354,16 @@ class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
             if (vals == null) {
               if (!viewPortHandler.isInBoundsRight(x)) break;
 
-              if (!viewPortHandler
-                      .isInBoundsY(buffer.buffer[bufferIndex + 1]) ||
+              if (!viewPortHandler.isInBoundsY(buffer.buffer![bufferIndex + 1]) ||
                   !viewPortHandler.isInBoundsLeft(x)) continue;
 
               if (dataSet.isDrawValuesEnabled()) {
                 drawValue(
                     c,
-                    formatter.getBarLabel(entry),
+                    formatter!.getBarLabel(entry),
                     x,
-                    buffer.buffer[bufferIndex + 1] +
-                        (entry.y >= 0 ? posOffset : negOffset),
+                    buffer.buffer![bufferIndex + 1]! +
+                        (entry.y>= 0 ? posOffset : negOffset),
                     color,
                     dataSet.getValueTextSize(),
                     dataSet.getValueTypeface());
@@ -376,24 +371,24 @@ class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
 
               if (entry.mIcon != null && dataSet.isDrawIconsEnabled()) {
                 double px = x;
-                double py = buffer.buffer[bufferIndex + 1] +
-                    (entry.y >= 0 ? posOffset : negOffset);
+                double py = buffer.buffer![bufferIndex + 1]! +
+                    (entry.y>= 0 ? posOffset : negOffset);
 
                 px += iconsOffset.x;
                 py += iconsOffset.y;
 
                 if (entry.mIcon != null && dataSet.isDrawIconsEnabled()) {
                   CanvasUtils.drawImage(
-                      c, Offset(px, py), entry.mIcon, Size(15, 15), drawPaint);
+                      c, Offset(px, py), entry.mIcon!, Size(15, 15), drawPaint);
                 }
               }
 
               // draw stack values
             } else {
-              List<double> transformed = List(vals.length * 2);
+              List<double?> transformed = List.filled(vals.length * 2, null);
 
               double posY = 0.0;
-              double negY = -entry.negativeSum;
+              double negY = -entry.negativeSum!;
 
               for (int k = 0, idx = 0; k < transformed.length; k += 2, idx++) {
                 double value = vals[idx];
@@ -413,14 +408,14 @@ class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
                 transformed[k + 1] = y * phaseY;
               }
 
-              trans.pointValuesToPixel(transformed);
+              trans!.pointValuesToPixel(transformed);
 
               for (int k = 0; k < transformed.length; k += 2) {
                 final double val = vals[k ~/ 2];
                 final bool drawBelow =
                     (val == 0.0 && negY == 0.0 && posY > 0.0) || val < 0.0;
                 double y =
-                    transformed[k + 1] + (drawBelow ? negOffset : posOffset);
+                    transformed[k + 1]! + (drawBelow ? negOffset : posOffset);
 
                 if (!viewPortHandler.isInBoundsRight(x)) break;
 
@@ -430,7 +425,7 @@ class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
                 if (dataSet.isDrawValuesEnabled()) {
                   drawValue(
                       c,
-                      formatter.getBarStackedLabel(val, entry),
+                      formatter!.getBarStackedLabel(val, entry),
                       x,
                       y,
                       color,
@@ -442,7 +437,7 @@ class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
                   CanvasUtils.drawImage(
                       c,
                       Offset(x + iconsOffset.x, y + iconsOffset.y),
-                      entry.mIcon,
+                      entry.mIcon!,
                       Size(15, 15),
                       drawPaint);
                 }
@@ -462,7 +457,7 @@ class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
 
   @override
   void drawValue(Canvas c, String valueText, double x, double y, Color color,
-      double textSize, TypeFace typeFace) {
+      double? textSize, TypeFace? typeFace) {
     valuePaint = PainterUtils.create(valuePaint, valueText, color, textSize,
         fontFamily: typeFace?.fontFamily, fontWeight: typeFace?.fontWeight);
     valuePaint.layout();
@@ -471,45 +466,45 @@ class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
   }
 
   @override
-  void drawHighlighted(Canvas c, List<Highlight> indices) {
-    BarData barData = _provider.getBarData();
+  void drawHighlighted(Canvas c, List<Highlight>? indices) {
+    BarData? barData = _provider!.getBarData();
 
-    for (Highlight high in indices) {
-      IBarDataSet set = barData.getDataSetByIndex(high.dataSetIndex);
+    for (Highlight high in indices!) {
+      IBarDataSet? set = barData!.getDataSetByIndex(high.dataSetIndex);
 
       if (set == null || !set.isHighlightEnabled()) continue;
 
-      BarEntry e = set.getEntryForXValue2(high.x, high.y);
+      BarEntry? e = set.getEntryForXValue2(high.x, high.y);
 
       if (!isInBoundsX(e, set)) continue;
 
-      Transformer trans = _provider.getTransformer(set.getAxisDependency());
+      Transformer trans = _provider!.getTransformer(set.getAxisDependency())!;
 
       var color = set.getHighLightColor();
       highlightPaint.color = Color.fromARGB(
           set.getHighLightAlpha(), color.red, color.green, color.blue);
 
-      bool isStack = (high.stackIndex >= 0 && e.isStacked()) ? true : false;
+      bool isStack = (high.stackIndex >= 0 && e!.isStacked()) ? true : false;
 
-      double y1;
+      double? y1;
       double y2;
 
       if (isStack) {
-        if (_provider.isHighlightFullBarEnabled()) {
+        if (_provider!.isHighlightFullBarEnabled()) {
           y1 = e.positiveSum;
-          y2 = -e.negativeSum;
+          y2 = -e.negativeSum!;
         } else {
-          Range range = e.ranges[high.stackIndex];
+          Range range = e.ranges![high.stackIndex]!;
 
           y1 = range.from;
           y2 = range.to;
         }
       } else {
-        y1 = e.y;
+        y1 = e!.y;
         y2 = 0.0;
       }
 
-      prepareBarHighlight(e.x, y1, y2, barData.barWidth / 2.0, trans);
+      prepareBarHighlight(e.x, y1!, y2, barData.barWidth / 2.0, trans);
 
       setHighlightDrawPos(high, _barRect);
       c.drawRect(_barRect, highlightPaint);

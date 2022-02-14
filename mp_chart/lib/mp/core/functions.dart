@@ -6,14 +6,19 @@ import 'package:mp_chart/mp/core/axis/y_axis.dart';
 import 'package:mp_chart/mp/core/legend/legend.dart';
 import 'package:mp_chart/mp/core/render/data_renderer.dart';
 
-typedef XAxisSettingFunction = void Function(
-    XAxis xAxis, Controller controller);
-typedef LegendSettingFunction = void Function(
-    Legend legend, Controller controller);
+typedef XAxisSettingFunction<T extends Controller> = void Function(
+    XAxis? xAxis, T controller);
+
+typedef LegendSettingFunction<T extends Controller> = void Function(
+    Legend? legend, T controller);
+
 typedef YAxisSettingFunction = void Function(
-    YAxis yAxis, RadarChartController controller);
-typedef AxisLeftSettingFunction = void Function(
-    YAxis axisLeft, BarLineScatterCandleBubbleController controller);
-typedef AxisRightSettingFunction = void Function(
-    YAxis axisRight, BarLineScatterCandleBubbleController controller);
-typedef DataRendererSettingFunction = void Function(DataRenderer renderer);
+    YAxis? yAxis, RadarChartController controller);
+
+typedef AxisLeftSettingFunction<T extends BarLineScatterCandleBubbleController> = void Function(
+    YAxis? axisLeft, T controller);
+
+typedef AxisRightSettingFunction<T extends BarLineScatterCandleBubbleController> = void Function(
+    YAxis? axisRight, T controller);
+
+typedef DataRendererSettingFunction = void Function(DataRenderer? renderer);

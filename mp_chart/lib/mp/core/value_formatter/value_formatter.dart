@@ -21,7 +21,7 @@ abstract class ValueFormatter {
     return value.toString();
   }
 
-  String getAxisLabel(double value, AxisBase axis) {
+  String getAxisLabel(double value, AxisBase? axis) {
     return getFormattedValue1(value);
   }
 

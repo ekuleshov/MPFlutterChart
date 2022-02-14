@@ -7,16 +7,16 @@ abstract class DataSet<T extends Entry> extends BaseDataSet<T> {
   List<T> _values;
 
   /// maximum y-value in the value array
-  double _yMax = -double.infinity;
+  double? _yMax = -double.infinity;
 
   /// minimum y-value in the value array
-  double _yMin = double.infinity;
+  double? _yMin = double.infinity;
 
   /// maximum x-value in the value array
-  double _xMax = -double.infinity;
+  double? _xMax = -double.infinity;
 
   /// minimum x-value in the value array
-  double _xMin = double.infinity;
+  double? _xMin = double.infinity;
 
   /// Creates a  DataSet object with the given values (entries) it represents. Also, a
   /// label that describes the DataSet can be specified. The label can also be
@@ -24,17 +24,13 @@ abstract class DataSet<T extends Entry> extends BaseDataSet<T> {
   ///
   /// @param values
   /// @param label
-  DataSet(List<T> values, String label) : super.withLabel(label) {
-    this._values = values;
-
-    if (_values == null) _values = List<T>();
-
+  DataSet(this._values, String label) : super.withLabel(label) {
     calcMinMax();
   }
 
   @override
   void calcMinMax() {
-    if (_values == null || _values.isEmpty) return;
+    if (_values.isEmpty) return;
 
     _yMax = -double.infinity;
     _yMin = double.infinity;
@@ -48,7 +44,7 @@ abstract class DataSet<T extends Entry> extends BaseDataSet<T> {
 
   @override
   void calcMinMaxY(double fromX, double toX) {
-    if (_values == null || _values.isEmpty) return;
+    if (_values.isEmpty) return;
 
     _yMax = -double.infinity;
     _yMin = double.infinity;
@@ -65,7 +61,7 @@ abstract class DataSet<T extends Entry> extends BaseDataSet<T> {
   /// Updates the min and max x and y value of this DataSet based on the given Entry.
   ///
   /// @param e
-  void calcMinMax1(T e) {
+  void calcMinMax1(T? e) {
     if (e == null) return;
 
     calcMinMaxX1(e);
@@ -74,15 +70,15 @@ abstract class DataSet<T extends Entry> extends BaseDataSet<T> {
   }
 
   void calcMinMaxX1(T e) {
-    if (e.x < _xMin) _xMin = e.x;
+    if (e.x < _xMin!) _xMin = e.x;
 
-    if (e.x > _xMax) _xMax = e.x;
+    if (e.x > _xMax!) _xMax = e.x;
   }
 
   void calcMinMaxY1(T e) {
-    if (e.y < _yMin) _yMin = e.y;
+    if (e.y < _yMin!) _yMin = e.y;
 
-    if (e.y > _yMax) _yMax = e.y;
+    if (e.y > _yMax!) _yMax = e.y;
   }
 
   @override
@@ -128,11 +124,11 @@ abstract class DataSet<T extends Entry> extends BaseDataSet<T> {
     return buffer.toString();
   }
 
-  set yMax(double value) {
+  set yMax(double? value) {
     _yMax = value;
   }
 
-  set yMin(double value) {
+  set yMin(double? value) {
     _yMin = value;
   }
 
@@ -145,36 +141,32 @@ abstract class DataSet<T extends Entry> extends BaseDataSet<T> {
   }
 
   @override
-  double getYMin() {
+  double? getYMin() {
     return _yMin;
   }
 
   @override
-  double getYMax() {
+  double? getYMax() {
     return _yMax;
   }
 
   @override
-  double getXMin() {
+  double? getXMin() {
     return _xMin;
   }
 
   @override
-  double getXMax() {
+  double? getXMax() {
     return _xMax;
   }
 
   @override
-  void addEntryOrdered(T e) {
+  void addEntryOrdered(T? e) {
     if (e == null) return;
-
-    if (_values == null) {
-      _values = List<T>();
-    }
 
     calcMinMax1(e);
 
-    if (_values.length > 0 && _values[_values.length - 1].x > e.x) {
+    if (_values.length > 0 && _values[_values.length - 1].x> e.x) {
       int closestIndex = getEntryIndex1(e.x, e.y, Rounding.UP);
       _values.insert(closestIndex, e);
     } else {
@@ -190,17 +182,10 @@ abstract class DataSet<T extends Entry> extends BaseDataSet<T> {
 
   @override
   bool addEntry(T e) {
-    if (e == null) return false;
-
-    List<T> valueDatas = values;
-    if (valueDatas == null) {
-      valueDatas = List<T>();
-    }
-
     calcMinMax1(e);
 
     // add the entry
-    valueDatas.add(e);
+    values.add(e);
     return true;
   }
 
@@ -220,7 +205,7 @@ abstract class DataSet<T extends Entry> extends BaseDataSet<T> {
     }
 
     List<T> valueDatas = values;
-    var pre = valueDatas.removeAt(index);
+    T pre = valueDatas.removeAt(index);
     e.x = pre.x;
     valueDatas.insert(index, e);
 
@@ -230,10 +215,10 @@ abstract class DataSet<T extends Entry> extends BaseDataSet<T> {
   }
 
   @override
-  bool removeEntry1(T e) {
+  bool removeEntry1(T? e) {
     if (e == null) return false;
 
-    if (_values == null) return false;
+    // if (_values == null) return false;
 
     // remove the entry
     bool removed = _values.remove(e);
@@ -247,29 +232,29 @@ abstract class DataSet<T extends Entry> extends BaseDataSet<T> {
 
   @override
   int getEntryIndex2(Entry e) {
-    return _values.indexOf(e);
+    return _values.indexOf(e as T);
   }
 
   @override
-  T getEntryForXValue1(double xValue, double closestToY, Rounding rounding) {
+  T? getEntryForXValue1(double xValue, double closestToY, Rounding rounding) {
     int index = getEntryIndex1(xValue, closestToY, rounding);
     if (index > -1) return _values[index];
     return null;
   }
 
   @override
-  T getEntryForXValue2(double xValue, double closestToY) {
+  T? getEntryForXValue2(double xValue, double closestToY) {
     return getEntryForXValue1(xValue, closestToY, Rounding.CLOSEST);
   }
 
   @override
-  T getEntryForIndex(int index) {
+  T? getEntryForIndex(int index) {
     return _values[index];
   }
 
   @override
   int getEntryIndex1(double xValue, double closestToY, Rounding rounding) {
-    if (_values == null || _values.isEmpty) return -1;
+    if (_values.isEmpty) return -1;
 
     int low = 0;
     int high = _values.length - 1;
@@ -278,10 +263,10 @@ abstract class DataSet<T extends Entry> extends BaseDataSet<T> {
     while (low < high) {
       int m = (low + high) ~/ 2;
 
-      final double d1 = _values[m].x - xValue,
-          d2 = _values[m + 1].x - xValue,
-          ad1 = d1.abs(),
-          ad2 = d2.abs();
+      final double d1 = _values[m].x- xValue;
+      final double d2 = _values[m + 1].x - xValue;
+      final double ad1 = d1.abs();
+      final double ad2 = d2.abs();
 
       if (ad2 < ad1) {
         // [m + 1] is closer to xValue
@@ -307,15 +292,15 @@ abstract class DataSet<T extends Entry> extends BaseDataSet<T> {
     }
 
     if (closest != -1) {
-      double closestXValue = _values[closest].x;
+      double? closestXValue = _values[closest].x;
       if (rounding == Rounding.UP) {
         // If rounding up, and found x-value is lower than specified x, and we can go upper...
-        if (closestXValue < xValue && closest < _values.length - 1) {
+        if (closestXValue< xValue && closest < _values.length - 1) {
           ++closest;
         }
       } else if (rounding == Rounding.DOWN) {
         // If rounding down, and found x-value is upper than specified x, and we can go lower...
-        if (closestXValue > xValue && closest > 0) {
+        if (closestXValue> xValue && closest > 0) {
           --closest;
         }
       }
@@ -325,7 +310,7 @@ abstract class DataSet<T extends Entry> extends BaseDataSet<T> {
         while (closest > 0 && _values[closest - 1].x == closestXValue)
           closest -= 1;
 
-        double closestYValue = _values[closest].y;
+        double? closestYValue = _values[closest].y;
         int closestYIndex = closest;
 
         while (true) {
@@ -336,8 +321,8 @@ abstract class DataSet<T extends Entry> extends BaseDataSet<T> {
 
           if (value.x != closestXValue) break;
 
-          if ((value.y - closestToY).abs() <
-              (closestYValue - closestToY).abs()) {
+          if ((value.y- closestToY).abs() <
+              (closestYValue! - closestToY).abs()) {
             closestYValue = closestToY;
             closestYIndex = closest;
           }
@@ -352,7 +337,7 @@ abstract class DataSet<T extends Entry> extends BaseDataSet<T> {
 
   @override
   List<T> getEntriesForXValue(double xValue) {
-    List<T> entries = List<T>();
+    List<T> entries = <T>[];
 
     int low = 0;
     int high = _values.length - 1;

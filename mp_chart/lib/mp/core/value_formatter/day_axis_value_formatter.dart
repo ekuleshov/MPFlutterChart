@@ -4,7 +4,7 @@ import 'package:mp_chart/mp/controller/bar_line_scatter_candle_bubble_controller
 import 'package:mp_chart/mp/core/value_formatter/value_formatter.dart';
 
 class DayAxisValueFormatter extends ValueFormatter {
-  final List<String> _months = List()
+  final List<String> _months = []
     ..add("Jan")
     ..add("Feb")
     ..add("Mar")
@@ -18,15 +18,15 @@ class DayAxisValueFormatter extends ValueFormatter {
     ..add("Nov")
     ..add("Dec");
 
-  BarLineScatterCandleBubbleController _controller;
+  late BarLineScatterCandleBubbleController _controller;
 
   DayAxisValueFormatter(BarLineScatterCandleBubbleController controller) {
     this._controller = controller;
   }
 
   @override
-  String getFormattedValue1(double value) {
-    int days = value.toInt();
+  String getFormattedValue1(double? value) {
+    int days = value!.toInt();
 
     int year = determineYear(days);
 

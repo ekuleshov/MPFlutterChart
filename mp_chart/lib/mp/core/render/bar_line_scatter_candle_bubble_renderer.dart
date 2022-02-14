@@ -11,10 +11,9 @@ abstract class BarLineScatterCandleBubbleRenderer extends DataRenderer {
   XBounds _xBounds;
 
   BarLineScatterCandleBubbleRenderer(
-      Animator animator, ViewPortHandler viewPortHandler)
-      : super(animator, viewPortHandler) {
-    _xBounds = XBounds(this.animator);
-  }
+      Animator? animator, ViewPortHandler viewPortHandler)
+      : this._xBounds = XBounds(animator),
+        super(animator, viewPortHandler);
 
   // ignore: unnecessary_getters_setters
   XBounds get xBounds => _xBounds;
@@ -38,12 +37,12 @@ abstract class BarLineScatterCandleBubbleRenderer extends DataRenderer {
   /// @param e
   /// @param set
   /// @return
-  bool isInBoundsX(Entry e, IBarLineScatterCandleBubbleDataSet set) {
+  bool isInBoundsX(Entry? e, IBarLineScatterCandleBubbleDataSet set) {
     if (e == null) return false;
 
     double entryIndex = set.getEntryIndex2(e).toDouble();
 
-    if (e == null || entryIndex >= set.getEntryCount() * animator.getPhaseX()) {
+    if (e == null || entryIndex >= set.getEntryCount() * animator!.getPhaseX()) {
       return false;
     } else {
       return true;

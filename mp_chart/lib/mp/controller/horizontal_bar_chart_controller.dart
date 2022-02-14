@@ -1,5 +1,5 @@
-import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
+
 import 'package:mp_chart/mp/controller/bar_chart_controller.dart';
 import 'package:mp_chart/mp/core/axis/y_axis.dart';
 import 'package:mp_chart/mp/core/common_interfaces.dart';
@@ -37,34 +37,34 @@ class HorizontalBarChartController extends BarChartController {
       bool drawBorders = false,
       bool clipValuesToContent = false,
       double minOffset = 30.0,
-      OnDrawListener drawListener,
-      YAxis axisLeft,
-      YAxis axisRight,
-      YAxisRenderer axisRendererLeft,
-      YAxisRenderer axisRendererRight,
-      Transformer leftAxisTransformer,
-      Transformer rightAxisTransformer,
-      XAxisRenderer xAxisRenderer,
+      OnDrawListener? drawListener,
+      YAxis? axisLeft,
+      YAxis? axisRight,
+      YAxisRenderer? axisRendererLeft,
+      YAxisRenderer? axisRendererRight,
+      Transformer? leftAxisTransformer,
+      Transformer? rightAxisTransformer,
+      XAxisRenderer? xAxisRenderer,
       bool customViewPortEnabled = false,
-      Matrix4 zoomMatrixBuffer,
+      Matrix4? zoomMatrixBuffer,
       bool pinchZoomEnabled = true,
       bool keepPositionOnRotation = false,
-      Paint gridBackgroundPaint,
-      Paint borderPaint,
-      Color backgroundColor,
-      Color gridBackColor,
-      Color borderColor,
+      Paint? gridBackgroundPaint,
+      Paint? borderPaint,
+      Color? backgroundColor,
+      Color? gridBackColor,
+      Color? borderColor,
       double borderStrokeWidth = 1.0,
-      AxisLeftSettingFunction axisLeftSettingFunction,
-      AxisRightSettingFunction axisRightSettingFunction,
-      OnTouchEventListener touchEventListener,
-      IMarker marker,
-      Description description,
+      AxisLeftSettingFunction? axisLeftSettingFunction,
+      AxisRightSettingFunction? axisRightSettingFunction,
+      OnTouchEventListener? touchEventListener,
+      IMarker? marker,
+      Description? description,
       String noDataText = "No chart data available.",
-      XAxisSettingFunction xAxisSettingFunction,
-      LegendSettingFunction legendSettingFunction,
-      DataRendererSettingFunction rendererSettingFunction,
-      OnChartValueSelectedListener selectionListener,
+      XAxisSettingFunction? xAxisSettingFunction,
+      LegendSettingFunction? legendSettingFunction,
+      DataRendererSettingFunction? rendererSettingFunction,
+      OnChartValueSelectedListener? selectionListener,
       double maxHighlightDistance = 100.0,
       bool highLightPerTapEnabled = true,
       double extraTopOffset = 0.0,
@@ -76,10 +76,10 @@ class HorizontalBarChartController extends BarChartController {
       bool resolveGestureVerticalConflict = false,
       double descTextSize = 12,
       double infoTextSize = 12,
-      Color descTextColor,
-      Color infoTextColor,
-      Color infoBgColor,
-      ChartTransListener chartTransListener})
+      Color? descTextColor,
+      Color? infoTextColor,
+      Color? infoBgColor,
+      ChartTransListener? chartTransListener})
       : super(
             highlightFullBarEnabled: highlightFullBarEnabled,
             drawValueAboveBar: drawValueAboveBar,
@@ -141,7 +141,7 @@ class HorizontalBarChartController extends BarChartController {
             touchEventListener: touchEventListener,
             chartTransListener: chartTransListener);
 
-  HorizontalBarChartPainter get painter => super.painter;
+  HorizontalBarChartPainter get painter => super.painter as HorizontalBarChartPainter;
 
   @override
   void initialPainter() {
@@ -228,20 +228,20 @@ class HorizontalBarChartController extends BarChartController {
 
   @override
   void setVisibleXRangeMaximum(double maxXRange) {
-    double xScale = xAxis.axisRange / (maxXRange);
+    double xScale = xAxis!.axisRange / (maxXRange);
     viewPortHandler.setMinimumScaleY(xScale);
   }
 
   @override
   void setVisibleXRangeMinimum(double minXRange) {
-    double xScale = xAxis.axisRange / (minXRange);
+    double xScale = xAxis!.axisRange / (minXRange);
     viewPortHandler.setMaximumScaleY(xScale);
   }
 
   @override
   void setVisibleXRange(double minXRange, double maxXRange) {
-    double minScale = xAxis.axisRange / minXRange;
-    double maxScale = xAxis.axisRange / maxXRange;
+    double minScale = xAxis!.axisRange / minXRange;
+    double maxScale = xAxis!.axisRange / maxXRange;
     viewPortHandler.setMinMaxScaleY(minScale, maxScale);
   }
 

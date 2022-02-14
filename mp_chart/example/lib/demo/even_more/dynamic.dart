@@ -168,7 +168,7 @@ class EvenMoreDynamicState extends ActionState<EvenMoreDynamic>
   }
 
   LineDataSet _createSet() {
-    LineDataSet set = LineDataSet(null, "DataSet 1");
+    LineDataSet set = LineDataSet([], "DataSet 1");
     set.setLineWidth(2.5);
     set.setCircleRadius(4.5);
     set.setColor1(Color.fromARGB(255, 240, 99, 99));
